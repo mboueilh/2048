@@ -1,0 +1,46 @@
+"""Tests unitaires"""
+
+import unittest
+import numpy
+from pystrat.strategie import strategie
+from pystrat.evaluate import evaluate_strategy    
+from pystrat.cp2048 import Game2048
+
+class Tests_Strategie(unittest.TestCase):
+    
+    def test_positif(self):
+        gen = evaluate_strategy(strategie)
+        liste = list(gen)
+        assert all(map(lambda x: x > 0, liste))
+    
+    def test_liste(self):
+        gen = evaluate_strategy(strategie)
+        liste = list(gen)
+        assert isinstance(liste, list)
+        
+    def test_direction(self):
+        direction = strategie(numpy.zeros((4, 4), dtype=int))
+        assert direction in {0, 1, 2, 3}
+
+
+    def test_game_play(self):
+        mat = numpy.zeros((4, 4), dtype=numpy.int32)
+        mat[1, 1] = 2
+        g = Game2048(mat)
+        g.play(0)
+        self.assertEqual(g.game[1, 0], 2)
+        self.assertEqual(g.game[1, 1], 0)
+        self.assertEqual(g.game.ravel().sum(), 1)
+    
+    def test_fusion(self):
+        mat = numpy.zeros((4, 4), dtype=numpy.int32)
+        mat[0, :] = [2,2,0,2]
+        g = Game2048(mat)
+        g.play(0)
+        self.assertEqual(g.game[0, 0], 4)
+        self.assertEqual(g.game[0, 1], 2)
+        self.assertEqual(g.game[0, 2], 0)
+        self.assertEqual(g.game[0, 3], 0)
+        
+if __name__ == '__main__':
+    unittest.main()
